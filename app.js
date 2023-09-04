@@ -7,13 +7,17 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 //MIDDLEWARES
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  console.log('development mode');
+  app.use(morgan('dev'));
+}
+
 app.use(
-  express.json()
+  express.json(),
 ); /**this middleware takes that incoming JSON format data and converts it into a JavaScript object */
 
 app.use(
-  express.static(`${__dirname}/public`)
+  express.static(`${__dirname}/public`),
 ); /**this middleware serves static files */
 
 app.use((req, res, next) => {

@@ -8,6 +8,7 @@
    When you enter a URL into the browser's address bar, the browser parses the URL to identify the protocol (e.g., HTTP or HTTPS), domain, and path. It then performs DNS (Domain Name System) resolution to find the IP address associated with the domain.
 
 2. **TCP/IP Socket Connection**
+
    - **TCP Handshake**
      - SYN: The browser sends a SYN (synchronize) packet to the server, indicating its intention to start a connection.
      - SYN-ACK: The server responds with a SYN-ACK packet, acknowledging the browser's request and indicating its readiness to establish the connection.
@@ -22,7 +23,6 @@
 ### Why HTTPS is secure?
 
 - HTTPS (Hypertext Transfer Protocol Secure) is secure because it uses encryption to protect the data transmitted between a user's browser and the website's server.
-
 
 ### Cookies
 
@@ -73,3 +73,7 @@ This separation of responsibilities allows Node.js to efficiently manage multipl
 - Events are emitted
 - Event loops picks them up
 - callbacks are called
+
+### To Run the Project
+
+npm run start:dev
