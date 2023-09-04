@@ -12,6 +12,10 @@ app.use(
   express.json()
 ); /**this middleware takes that incoming JSON format data and converts it into a JavaScript object */
 
+app.use(
+  express.static(`${__dirname}/public`)
+); /**this middleware serves static files */
+
 app.use((req, res, next) => {
   console.log('Hello from the middleware');
   next();
