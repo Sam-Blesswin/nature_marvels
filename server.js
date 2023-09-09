@@ -1,6 +1,6 @@
-//enviroment variables
 const mongoose = require('mongoose');
 
+//enviroment variables
 const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
@@ -8,20 +8,12 @@ dotenv.config({ path: './config.env' });
 
 const app = require('./app');
 
+//DB connection
 const DB = process.env.DATABASE.replace(
   '<DATABASE_PASSWORD>',
   process.env.DATABASE_PASSWORD,
 );
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then((con) => {
-    console.log(con.connections);
-    console.log('DB connection successful');
-  });
+mongoose.connect(DB).then(() => console.log('DB connection successful'));
 
 //START SERVER
 const port = process.env.PORT;
