@@ -1,11 +1,29 @@
 const Tour = require('../models/tourModel');
 
 //ROUTE HANDLERS
-exports.getAlltours = async (req, res) => {
+exports.getAllTours = async (req, res) => {
   console.log(req.requestTime);
+  console.log(req.query);
 
   try {
-    const tours = await Tour.find(); //fetch all tours from DB and convert it to JSON
+    //BUILD QUERY
+    //1) Filtering
+    const queryObj = { ...req.query }; //deep copy,copy by value not by reference
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    //2)Advanced filtering
+    let queryStr = JSON.stringify(queryObj); //convert the queryObj to a string
+    //{difficulty:'easy',duration:{$gte:5}} //mongodb querying syntax.
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); //Add the operators with $ operators
+    console.log(JSON.parse(queryStr)); //convert the string to an object
+
+    //fetch tours from DB that matches the query and convert it to JSON
+    const query = Tour.find(JSON.parse(queryStr)); //mongoose method to find the tours in the DB
+    //EXECUTE QUERY
+    const tours = await query;
+
+    //
     res.status(200).json({
       status: 'success',
       results: tours.length,
