@@ -19,11 +19,45 @@ exports.getAllTours = async (req, res) => {
     console.log(JSON.parse(queryStr)); //convert the string to an object
 
     //fetch tours from DB that matches the query and convert it to JSON
-    const query = Tour.find(JSON.parse(queryStr)); //mongoose method to find the tours in the DB
+    let query = Tour.find(JSON.parse(queryStr)); //mongoose method to find the tours in the DB
+
+    //3)Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' '); //sort by multiple fields
+      console.log(sortBy);
+      //sort('price ratingAverage') //mongodb sorting syntax based on price and if same price then based on avg.
+      query = query.sort(sortBy);
+    } else {
+      //default sorting
+      query = query.sort('-createdAt');
+    }
+
+    //4)Field limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v'); //exclude the __v field
+    }
+
+    //5)Pagination
+    //page=3&limit=10, 1-10 page 1, 11-20 page 2, 21-30 page 3
+    const page = req.query.page * 1 || 1; //default page is 1 if no page is passed
+    const limit = req.query.limit * 1 || 100; //default limit is 100 if no limit is passed
+    const skip = (page - 1) * limit; //skip the first 10 results
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) {
+        throw new Error('This page does not exist');
+      }
+    }
+    query = query.skip(skip).limit(limit); //skip the first 10 results and limit the result to 10
+
     //EXECUTE QUERY
     const tours = await query;
+    //query.sort().select().skip().limit()
 
-    //
+    //SEND RESPONSEgi
     res.status(200).json({
       status: 'success',
       results: tours.length,

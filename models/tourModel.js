@@ -50,6 +50,7 @@ const tourSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(), //to automatically set the date when a new tour is created
+    select: false, //to hide the date from the client side
   },
   startDates: [Date], //array of dates
 });
