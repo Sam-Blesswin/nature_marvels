@@ -48,9 +48,9 @@ class APIFeatures {
     //page=3&limit=10, 1-10 page 1, 11-20 page 2, 21-30 page 3
     const page = this.queryReq.page * 1 || 1; //default page is 1 if no page is passed
     const limit = this.queryReq.limit * 1 || 100; //default limit is 100 if no limit is passed
-    const skip = (page - 1) * limit; //skip the first 10 results
+    const skip = (page - 1) * limit; //page=3,limit =20 skip the first 20 results
 
-    this.query = this.query.skip(skip).limit(limit); //skip the first 10 results and limit the result to 10
+    this.query = this.query.skip(skip).limit(limit); //skip the first 20 results and limit the result to 10
     return this;
   }
 }

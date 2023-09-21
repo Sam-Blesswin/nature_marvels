@@ -9,6 +9,42 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
+//AGGREGATION
+exports.getTourStats = async (req, res) => {
+  try {
+    const tourStats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          //_id: null,
+          _id: '$difficulty',
+          numRatings: { $sum: '$ratingsQuantity' },
+          numTours: { $sum: 1 },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minprice: { $min: '$price' },
+          maxprice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: { tourStats },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
 //ROUTE HANDLERS
 exports.getAllTours = async (req, res) => {
   console.log(req.requestTime);
