@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const APIFeatures = require('../utils/apiFeatures');
 
 //ALIAS ROUTE HANDLERS
 exports.aliasTopTours = (req, res, next) => {
@@ -14,55 +15,15 @@ exports.getAllTours = async (req, res) => {
   console.log(req.query);
 
   try {
-    //BUILD QUERY
-    //1) Filtering
-    const queryObj = { ...req.query }; //deep copy,copy by value not by reference
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]);
+    //BUILD AND EXECUTE QUERY
+    //const feature = new APIFeatures(req.query,Tour.find()); //feature is an object of APIFeatures class //constructor is called
+    const feature = new APIFeatures(req.query, Tour.find())
+      .Filter()
+      .Sort()
+      .LimitFields()
+      .Paginate(); //chaining of methods
 
-    //2)Advanced filtering
-    let queryStr = JSON.stringify(queryObj); //convert the queryObj to a string
-    //{difficulty:'easy',duration:{$gte:5}} //mongodb querying syntax.
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); //Add the operators with $ operators
-    console.log(JSON.parse(queryStr)); //convert the string to an object
-
-    //fetch tours from DB that matches the query and convert it to JSON
-    let query = Tour.find(JSON.parse(queryStr)); //mongoose method to find the tours in the DB
-
-    //3)Sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' '); //sort by multiple fields
-      console.log(sortBy);
-      //sort('price ratingAverage') //mongodb sorting syntax based on price and if same price then based on avg.
-      query = query.sort(sortBy);
-    } else {
-      //default sorting
-      query = query.sort('-createdAt');
-    }
-
-    //4)Field limiting
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v'); //exclude the __v field
-    }
-
-    //5)Pagination
-    //page=3&limit=10, 1-10 page 1, 11-20 page 2, 21-30 page 3
-    const page = req.query.page * 1 || 1; //default page is 1 if no page is passed
-    const limit = req.query.limit * 1 || 100; //default limit is 100 if no limit is passed
-    const skip = (page - 1) * limit; //skip the first 10 results
-    if (req.query.page) {
-      const numTours = await Tour.countDocuments();
-      if (skip >= numTours) {
-        throw new Error('This page does not exist');
-      }
-    }
-    query = query.skip(skip).limit(limit); //skip the first 10 results and limit the result to 10
-
-    //EXECUTE QUERY
-    const tours = await query;
+    const tours = await feature.query;
     //query.sort().select().skip().limit()
 
     //SEND RESPONSEgi
