@@ -14,10 +14,11 @@ exports.getTourStats = async (req, res) => {
   try {
     const tourStats = await Tour.aggregate([
       {
-        $match: { ratingsAverage: { $gte: 4.5 } },
+        $match: { ratingsAverage: { $gte: 4.5 } }, //filters the document
       },
       {
         $group: {
+          //groups the filtered document based on id
           //_id: null,
           _id: '$difficulty',
           numRatings: { $sum: '$ratingsQuantity' },
@@ -29,13 +30,59 @@ exports.getTourStats = async (req, res) => {
         },
       },
       {
-        $sort: { avgPrice: 1 },
+        $sort: { avgPrice: 1 }, //sorts the grouped document in ascending order (1 means ascending)
       },
     ]);
 
     res.status(200).json({
       status: 'success',
       data: { tourStats },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates', //unwinds the startDates array //Create seperate object for each date
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' }, //groups the document based on month
+          numTourStarts: { $sum: 1 },
+          tours: { $push: '$name' },
+        },
+      },
+      {
+        $addFields: { month: '$_id' }, //adds a new field to the grouped document
+      },
+      {
+        $project: { _id: 0 }, //removes the _id field
+      },
+      {
+        $sort: { numTourStarts: -1 }, //sorts the grouped document in descending order
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        plan,
+      },
     });
   } catch (err) {
     res.status(404).json({
