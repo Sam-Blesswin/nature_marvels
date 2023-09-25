@@ -198,6 +198,10 @@ It provides a way to intercept and modify data before it's saved to or retrieved
 
 It allows you to intercept and modify database queries before they are executed. It's useful for tasks like adding additional criteria to queries, implementing access control, or logging query activity. Query middleware helps you customize and enhance the behavior of database queries within your application.
 
+### Aggregate Middleware
+
+It allows you to intercept and modify the aggregation pipeline before it's executed. It's useful for tasks like data transformation, filtering, and adding custom stages to the aggregation process.
+
 ## MVC Architecture
 
 MVC (Model-View-Controller) is a design pattern used in backend programming to organize code into three components:

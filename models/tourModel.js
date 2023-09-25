@@ -106,6 +106,14 @@ tourSchema.post(/^find/, function (docs, next) {
   next();
 });
 
+//AGGREGATION MIDDLEWARE: runs before .aggregate()
+//hiding the secret tours
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  console.log(this.pipeline());
+  next();
+});
+
 //Model
 const Tour = mongoose.model('Tour', tourSchema);
 
