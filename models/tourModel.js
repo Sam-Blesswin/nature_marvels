@@ -57,7 +57,11 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(), //to automatically set the date when a new tour is created
       select: false, //to hide the date from the client side
     },
-    startDates: [Date], //array of dates
+    startDates: [Date], //array of dates,
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true }, //to show virtual properties in the client side
@@ -73,7 +77,7 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
-//Document middleware: runs before .save() and .create()
+//DOCUMENT MIDDLEWARE: runs before .save() and .create()
 //We are using pre because we want to run this function before the document is saved to the database
 tourSchema.pre('save', function (next) {
   //slug is the name of the field in the database
@@ -85,6 +89,22 @@ tourSchema.pre('save', function (next) {
 //   console.log(doc);
 //   next();
 // });
+
+//QUERY MIDDLEWARE: runs before .find() and .findOne()
+//hiding the secret tours
+///^find/ means that the function will run only for queries that start with the word find
+tourSchema.pre(/^find/, function (next) {
+  //tourSchema.pre('find', function (next) {
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now(); //to measure the time taken to run the query
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
+  console.log(docs);
+  next();
+});
 
 //Model
 const Tour = mongoose.model('Tour', tourSchema);

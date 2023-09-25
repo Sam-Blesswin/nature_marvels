@@ -192,7 +192,11 @@ MongoDB schema is a flexible structure that defines the organization and layout 
 
 ### Document Middleware
 
-It provides a way to intercept and modify data before it's saved to or retrieved from the database. It's useful for tasks like data validation, security measures, etc.., making it easier to customize data handling logic within your application's database interactions
+It provides a way to intercept and modify data before it's saved to or retrieved from the database. It's useful for tasks like data validation, security measures, etc.., making it easier to customize data handling logic within your application's database interactions.
+
+### Query Middleware
+
+It allows you to intercept and modify database queries before they are executed. It's useful for tasks like adding additional criteria to queries, implementing access control, or logging query activity. Query middleware helps you customize and enhance the behavior of database queries within your application.
 
 ## MVC Architecture
 
