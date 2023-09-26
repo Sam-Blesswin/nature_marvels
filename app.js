@@ -40,17 +40,6 @@ app.use('/api/v1/users', userRouter);
 //UNHANDLED ROUTES
 //.all method is used to handle all HTTP requests
 app.all('*', (req, res, next) => {
-  // res.status(404).json({
-  //   status: 'fail',
-  //   message: `Can't find ${req.originalUrl} on this server`,
-  // });
-
-  /*
-  const err = new Error(`Can't find ${req.originalUrl} on this server`);
-  err.statusCode = 404; //custom property added to the err object
-  err.status = 'fail'; //custom property added to the err object
-  */
-
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404)); //automatically calls the global error handler
   //because AppError is a subclass of Error
 });

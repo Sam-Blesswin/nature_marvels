@@ -139,26 +139,59 @@ exports.getTour = async (req, res) => {
   }
 };
 
-exports.createTour = async (req, res) => {
-  console.log(req.body);
-  // const testTour = new Tour({})
-  // testTour.save();
+// #code 1
+// exports.createTour = async (req, res) => {
+//   console.log(req.body);
+//   // const testTour = new Tour({})
+//   // testTour.save();
 
-  try {
-    const newTour = await Tour.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      data: {
-        tour: newTour,
-      },
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
-  }
+//   try {
+//     const newTour = await Tour.create(req.body);
+//     res.status(201).json({
+//       status: 'success',
+//       data: {
+//         tour: newTour,
+//       },
+//     });
+//   } catch (err) {
+//     res.status(400).json({
+//       status: 'fail',
+//       message: err,
+//     });
+//   }
+// };
+
+// #code 2
+//Code 2 is essentially a refactoring of Code 1 to make it more concise and to handle errors in a consistent way
+/*
+Before the actual tour creation logic is executed, the CatchAsync middleware is invoked. 
+This middleware is a higher-order function that takes an asynchronous function as an argument 
+(in this case, the async (req, res, next) => { ... } function).
+The purpose of this middleware is to handle any errors that might occur during the execution of the inner function
+*/
+/*
+If an error occurs during tour creation, it is caught by the CatchAsync middleware.
+The middleware then forwards the error to the global error-handling middleware 
+*/
+
+//Function Composition
+// eslint-disable-next-line arrow-body-style
+const CatchAsync = (fn) => {
+  // console.log('Catch Async Middleware called');
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
 };
+
+exports.createTour = CatchAsync(async (req, res, next) => {
+  const newTour = await Tour.create(req.body);
+  res.status(201).json({
+    status: 'success',
+    data: {
+      tour: newTour,
+    },
+  });
+});
 
 exports.updateTour = async (req, res) => {
   try {
