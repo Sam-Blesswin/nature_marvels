@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 //ALIAS ROUTE HANDLERS
 exports.aliasTopTours = (req, res, next) => {
@@ -83,6 +84,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 exports.getAllTours = catchAsync(async (req, res, next) => {
   console.log(req.requestTime);
   console.log(req.query);
+  console.log(Object.keys(req.query)[0]);
 
   //BUILD AND EXECUTE QUERY
   //const feature = new APIFeatures(req.query,Tour.find()); //feature is an object of APIFeatures class //constructor is called
@@ -104,8 +106,16 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
+  // console.log(req.query);
+  console.log(req.params);
+
+  // const tour = await Tour.findById(req.params.id);
+  //Tour.findOne({ _id: req.params.id }
   const tour = await Tour.findById(req.params.id);
   //Tour.findOne({ _id: req.params.id }) //what mongoose does to find the element in bg
+  if (!tour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: tour,
@@ -166,6 +176,9 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     //if the validators fail, the update will not be applied and the error will be thrown
     //if the validators pass, the update will be applied and the new document will be returned
   });
+  if (!tour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -175,7 +188,10 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+  if (!tour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
   res.status(204).json({
     status: 'success',
     data: null,
