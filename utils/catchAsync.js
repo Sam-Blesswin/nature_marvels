@@ -1,4 +1,5 @@
 //Function Composition
+//try catch block wrapper
 
 // eslint-disable-next-line arrow-body-style
 module.exports = (fn) => {

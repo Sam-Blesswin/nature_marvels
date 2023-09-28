@@ -228,5 +228,8 @@ Debugger : Installed ndb package to debug code.
 
 Handling runtime operational errors : Problems that we can predict might happen, so we need to handle it in advance.
 
-By Setting up a global error handling middleware.
+Error handler: Handle operational errors by Setting up a global error handling middleware. Whenever we get any error inside express middleware it will be handled by global error handling middleware.
 
+Unhandled Rejections: Setting up a safety net to handle any unhandled promise rejection.
+
+Uncaught Exceptions: Setting up a safety net to handle any Uncaught exceptions.
