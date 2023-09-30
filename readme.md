@@ -94,19 +94,13 @@ Have your own mongoDb setup with credentials and config.env file
 
 ### Express
 
-command : "npm i express"
-
 Express is a node.js framework with high level of abstraction.
 
 ### Morgan
 
-command : "npm i morgan"
-
 morgan is a popular middleware for Node.js web applications, primarily used for HTTP request logging. It provides a simple and customizable logging solution that can be easily integrated into Express.js or other Node.js frameworks.
 
 ### Dotenv
-
-command : "npm i dotenv"
 
 The dotenv npm package is used to load environment variables from a .env file into Node.js applications, simplifying the management of configuration settings.
 
@@ -122,27 +116,23 @@ Prettier is a code formatter that ensures consistent formatting.
 
 ### Mongoose
 
-command : npm i mongoose
-
 Mongoose simplifies working with MongoDB databases by providing an object modeling framework and tools for data validation, querying, and manipulation.
 
 ### Slugify
-
-command : npm i slugify
 
 The slugify package is used to convert text into a URL-friendly format (slug) by replacing spaces and special characters with hyphens or underscores, making it suitable for use in website URLs.
 
 ### validator
 
-command : npm i validator
-
 validator package is a widely-used library for validating and sanitizing strings in JavaScript.
 
 ### NDB
 
-command : npm i ndb
-
 ndb is a powerful debugging tool for Node.js applications, developed by Google.
+
+### bcryptjs
+
+A JavaScript implementation of the bcrypt password hashing algorithm, which is designed to securely store passwords by hashing them with a salt
 
 ## CRUD : HTTP METHODS
 
@@ -233,3 +223,10 @@ Error handler: Handle operational errors by Setting up a global error handling m
 Unhandled Rejections: Setting up a safety net to handle any unhandled promise rejection.
 
 Uncaught Exceptions: Setting up a safety net to handle any Uncaught exceptions.
+
+### Authentication
+
+Never store password without encrypting in database.
+
+JWT : Json Web Tokens
+
