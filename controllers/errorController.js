@@ -50,7 +50,7 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, req, res);
   } else {
-    let error = { ...err };
+    let error = { ...err }; //Copying the error object
     if (err.name === 'CastError') error = handleCastErrorDB(error);
     else if (err.code === 11000) error = handleDuplicateErrorDB(error);
     else if (err.name === 'ValidationError')

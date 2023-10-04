@@ -134,6 +134,10 @@ ndb is a powerful debugging tool for Node.js applications, developed by Google.
 
 A JavaScript implementation of the bcrypt password hashing algorithm, which is designed to securely store passwords by hashing them with a salt
 
+### jsonwebtoken
+
+used for generating and verifying JSON Web Tokens (JWTs) for user authentication and authorization in web applications.
+
 ## CRUD : HTTP METHODS
 
 REST Methods
@@ -230,3 +234,5 @@ Never store password without encrypting in database.
 
 JWT : Json Web Tokens
 
+JWT are a stateless solution for authentication. There is no need to store any login session of user on the server.
+without secret key that is stored in server, nobody can manipulate the jwt data, because they cannot create a valid signature for the new data.
