@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const util = require('util'); //node builtin package
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -17,6 +17,7 @@ exports.signup = catchAsync(async (req, res) => {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
+    passwordChangedAt: req.body.passwordChangedAt,
   }); //creating a new user only with the data we want
 
   const token = signToken(newUser._id); //sign the token with the user id (newUser._id)
@@ -48,4 +49,51 @@ exports.login = catchAsync(async (req, res, next) => {
     status: 'success',
     token,
   });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  //check whether is available
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  console.log(`Token: ${token}`);
+  if (!token) {
+    return next(
+      new AppError('You are not logged in! Please log in to get access.', 401),
+    );
+  }
+  //verigy token
+  //jwt.verify is a synchronous function
+  //The promisify() function will return a version Promise of your function
+  const decoded = await util.promisify(jwt.verify)(
+    token,
+    process.env.JWT_SECRET,
+  );
+  console.log(`Decoded Token:${JSON.stringify(decoded)}`);
+
+  //check if user still exists
+  const _user = await User.findById(decoded.id);
+  if (!_user) {
+    return next(
+      new AppError(
+        'The user belonging to this token does no longer exist.',
+        401,
+      ),
+    );
+  }
+
+  //check if user changed password after the token was issued
+  //decoded.iat : timestamp when JWT token was issued
+  if (_user.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please log in again.', 401),
+    );
+  }
+
+  req.user = _user; //add user to the request object
+  next();
 });

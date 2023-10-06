@@ -14,9 +14,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email'],
   },
-  photo: {
-    type: String,
-  },
+  photo: String,
   password: {
     type: String,
     required: [true, 'Please provide a password'],
@@ -34,6 +32,7 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same',
     },
   },
+  passwordChangedAt: Date,
 });
 
 //Document Middleware
@@ -48,12 +47,27 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-//make this function available to user object
+//this method is added to the instance created using schema
+//This means that you can call correctPassword on individual user instances,
+//like user.correctPassword, but you cannot call it on the User model itself
+//because it's not a static method
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    );
+    console.log(`${JWTTimestamp}, ${changedTimestamp}`);
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false; //false means not changed
 };
 
 const User = mongoose.model('User', userSchema);
