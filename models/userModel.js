@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
+  role: {
+    type: String,
+    enum: ['user', 'guide', 'admin'],
+    default: 'user',
+  },
 });
 
 //Document Middleware

@@ -18,6 +18,7 @@ exports.signup = catchAsync(async (req, res) => {
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
     passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
   }); //creating a new user only with the data we want
 
   const token = signToken(newUser._id); //sign the token with the user id (newUser._id)
@@ -97,3 +98,15 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = _user; //add user to the request object
   next();
 });
+
+//To pass arguments to middleware
+exports.restrictTo = function (roles) {
+  return catchAsync(async (req, res, next) => {
+    if (req.user.role !== roles) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403),
+      );
+    }
+    next();
+  });
+};

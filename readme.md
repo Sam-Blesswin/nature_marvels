@@ -168,6 +168,7 @@ DELETE /users/{id} - This endpoint deletes an existing user from the API. The cl
 - 204 - No Content
 - 400 - Bad Request
 - 404 - Not Found
+- 403 - Forbidden
 - 500 - Internal Server Error
 
 ## Middleware
