@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto'); //built in node module for cryptography
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -38,6 +39,8 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'guide', 'admin'],
     default: 'user',
   },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 //Document Middleware
@@ -73,6 +76,21 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     return JWTTimestamp < changedTimestamp;
   }
   return false; //false means not changed
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex'); //create a random string
+
+  //we are just modifying the document, not saving it here
+  this.passwordResetToken = crypto //hash the reset token
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; //10 minutes
+
+  console.log(resetToken, this.passwordResetToken);
+
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);

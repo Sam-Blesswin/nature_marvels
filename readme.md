@@ -138,6 +138,10 @@ A JavaScript implementation of the bcrypt password hashing algorithm, which is d
 
 used for generating and verifying JSON Web Tokens (JWTs) for user authentication and authorization in web applications.
 
+### nodemailer
+
+a javaScript library used for sending email messages from Node.js applications. It provides an easy-to-use interface for creating and sending emails using various transport methods, such as SMTP, Sendmail,
+
 ## CRUD : HTTP METHODS
 
 REST Methods
@@ -237,3 +241,13 @@ JWT : Json Web Tokens
 
 JWT are a stateless solution for authentication. There is no need to store any login session of user on the server.
 without secret key that is stored in server, nobody can manipulate the jwt data, because they cannot create a valid signature for the new data.
+
+## Send Email to client
+
+### Transporter
+
+a software component or service responsible for delivering email messages from the sender (e.g., a server or application) to the recipient's email server
+
+### Mailtrap
+
+Mailtrap is a cloud-based email testing and debugging tool for developers and QA professionals.
