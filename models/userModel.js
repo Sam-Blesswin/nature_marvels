@@ -41,18 +41,35 @@ const userSchema = new mongoose.Schema({
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 //Document Middleware
 //Encrypted Password
 userSchema.pre('save', async function (next) {
   //Only run this function if password was actually modified
+  //creating a new user also counts as modifying the password
   if (!this.isModified('password')) return next();
+  if (!this.isNew) {
+    this.passwordChangedAt = Date.now() - 1000; //to avoid race condition between updating db and json token creation
+  }
 
   //12 - salt value, hashing cost //bigger the vlaue strong the encryption be
   this.password = await bcrypt.hash(this.password, 12);
   this.confirmPassword = undefined; //donot store confirm password in Db
+
   next();
+});
+
+//To find only active users
+userSchema.pre(/^find/, function (next) {
+  //this points to the current query
+  this.find({ active: { $ne: false } });
+  next(); //call next middleware function
 });
 
 //this method is added to the instance created using schema

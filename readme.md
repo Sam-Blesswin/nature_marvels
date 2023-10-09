@@ -251,3 +251,43 @@ a software component or service responsible for delivering email messages from t
 ### Mailtrap
 
 Mailtrap is a cloud-based email testing and debugging tool for developers and QA professionals.
+
+### Deleting a user
+
+We wont delete the user from database but mark them as inactive.
+
+## Best Security Practise
+
+1. Always store encrypted password in database.
+
+2. Implement rate limiting. Rate limiting is a mechanism that restricts the number of requests a user or system can make within a specified time to prevent overload of a service or API.
+
+3. Implement maximum login attempts.
+
+4. Store JWT in HTTPOnly cookies
+
+5. Set special HTTP headers (helmet package) to sanitize user input, means cleaning or filtering the data provided by users to remove potentially harmful or malicious content
+
+6. Limit body payload
+
+7. mongoose prevent nosql query injection
+
+### Best Practices
+
+1. Always use HTTPS
+
+2. create random password reset token with expiry date
+
+3. Deny access to JWT after password changed
+
+4. Don't commit sensitive config data to git
+
+5. Don't send error details to client
+
+6. confirm user email address after creating account
+
+7. Implement two factor authentication
+
+8. Keep user logged in with refresh token
+
+9. prevent cross-site request forgery (with csurf package).

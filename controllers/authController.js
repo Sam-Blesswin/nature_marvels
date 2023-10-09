@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const util = require('util'); //node builtin package
+const crypto = require('crypto');
+
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -89,7 +91,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   //check if user changed password after the token was issued
-  //decoded.iat : timestamp when JWT token was issued
+  //decoded.iat : timestamp when JWT token was issued (issued at)
   if (_user.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again.', 401),
@@ -150,4 +152,54 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.resetPassword = catchAsync(async (req, res, next) => {});
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  //Get user based on the token
+  console.log(req.params.token);
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gte: Date.now() },
+  });
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired', 400));
+  }
+  //If token has not expired, and there is a user, set the new password
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  //Update changedPasswordAt property for the user
+  await user.save();
+  //log the user in, send JWT
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  //const { user } = req; //cannot get user.password directly from user object because in password `select` field it set to false
+  //so we need to include password field in the query
+  const user = await User.findById(req.user.id).select('+password'); //password is now selected
+  if (!(await user.correctPassword(req.body.currentPassword, user.password))) {
+    return next(new AppError('Incorrect password', 401));
+  }
+  user.password = req.body.newPassword;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
+
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: 'success',
+    token,
+    message: 'Password updated successfully',
+  });
+});
