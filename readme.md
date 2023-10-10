@@ -158,6 +158,10 @@ to sanitize user inputs and prevent NoSQL injection attacks when working with Mo
 
 is used for sanitizing user input to prevent cross-site scripting (XSS) attacks in web applications.
 
+### hpp
+
+known as HTTP Parameter Pollution, is a security middleware for Node.js and Express.js applications that helps prevent HTTP parameter pollution attacks
+
 ## CRUD : HTTP METHODS
 
 REST Methods

@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -42,6 +43,22 @@ app.use(mongoSanitize());
 
 //Data sanitization against XSS
 app.use(xss());
+
+//prevent parameter pollution
+//in req query params: ?sort=duration&sort=price it only consider the last (sort = price)
+//but in some cases: ?duration=5&duration=10 we need both data with duration to be 5 and 10 //can be achieved with whitelist
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  }),
+);
 
 //serving static files
 app.use(
