@@ -260,7 +260,7 @@ We wont delete the user from database but mark them as inactive.
 
 1. Always store encrypted password in database.
 
-2. Implement rate limiting. Rate limiting is a mechanism that restricts the number of requests a user or system can make within a specified time to prevent overload of a service or API.
+2. Implement rate limiting. Rate limiting is a mechanism that restricts the number of requests from a IPaddress can make within a specified time to prevent overload of a service or API.
 
 3. Implement maximum login attempts.
 

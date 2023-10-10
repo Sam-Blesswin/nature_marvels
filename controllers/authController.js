@@ -14,6 +14,32 @@ const signToken = (id) => {
   return _token;
 };
 
+const cookieOptions = {
+  expires: new Date(
+    Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000, //in milliseconds
+  ),
+  httpOnly: true,
+};
+if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+const createAndSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id); //sign the token with the user id (user._id)
+  console.log(token);
+
+  //send jwt as cookie
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined; //To avoid password being sent to client while signup
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -23,16 +49,7 @@ exports.signup = catchAsync(async (req, res) => {
     passwordChangedAt: req.body.passwordChangedAt,
     role: req.body.role,
   }); //creating a new user only with the data we want
-
-  const token = signToken(newUser._id); //sign the token with the user id (newUser._id)
-  console.log(token);
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createAndSendToken(newUser, 201, res); //send the token to the client
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -48,15 +65,11 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createAndSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  //check whether is available
+  //check whether token is available
   let token;
   if (
     req.headers.authorization &&
@@ -73,6 +86,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   //verigy token
   //jwt.verify is a synchronous function
   //The promisify() function will return a version Promise of your function
+  //jwt.verify : checks whether the token is valid or not
+  //also checks whether the token has expired or not
   const decoded = await util.promisify(jwt.verify)(
     token,
     process.env.JWT_SECRET,
@@ -173,16 +188,9 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   //Update changedPasswordAt property for the user
   await user.save();
-  //log the user in, send JWT
-  const token = signToken(user._id);
 
-  res.status(200).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  });
+  //send JWT
+  createAndSendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -196,10 +204,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.confirmPassword = req.body.confirmPassword;
   await user.save();
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-    message: 'Password updated successfully',
-  });
+  createAndSendToken(user, 200, res);
 });
