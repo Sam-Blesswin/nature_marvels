@@ -142,6 +142,22 @@ used for generating and verifying JSON Web Tokens (JWTs) for user authentication
 
 a javaScript library used for sending email messages from Node.js applications. It provides an easy-to-use interface for creating and sending emails using various transport methods, such as SMTP, Sendmail,
 
+### express-rate-limit
+
+It helps limit the rate at which requests are made to a server
+
+### helmet
+
+is used for enhancing the security of web applications by setting various HTTP headers.
+
+### express-mongo-sanitize
+
+to sanitize user inputs and prevent NoSQL injection attacks when working with MongoDB
+
+### xss-clean
+
+is used for sanitizing user input to prevent cross-site scripting (XSS) attacks in web applications.
+
 ## CRUD : HTTP METHODS
 
 REST Methods
@@ -173,6 +189,7 @@ DELETE /users/{id} - This endpoint deletes an existing user from the API. The cl
 - 400 - Bad Request
 - 404 - Not Found
 - 403 - Forbidden
+- 429 - Too Many Requests
 - 500 - Internal Server Error
 
 ## Middleware
